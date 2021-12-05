@@ -13,11 +13,11 @@
     call switch_to_pm ; We are never return from here.
     jmp $ ; this will actually never be executed
 
-%include "src/modules/disk.asm"
-%include "src/switch_pm/gdt.asm"
-%include "src/modules/console.asm"
-%include "src/modules/console32.asm"
-%include "src/switch_pm/switch_to_pm.asm"
+%include "src/boot/modules/disk.asm"
+%include "src/boot/switch_pm/gdt.asm"
+%include "src/boot/modules/console.asm"
+%include "src/boot/modules/console32.asm"
+%include "src/boot/switch_pm/switch_to_pm.asm"
 
 
 [bits 16]

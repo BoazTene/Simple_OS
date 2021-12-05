@@ -1,46 +1,37 @@
 
 OSNAME = "SuperDuperOS"
-BOOT_LOADER = "src/bootloader.asm"
-BOOT_LOADER_BINARY = 'bin/bootloader.bin'
-KERNEL = 'src/kernel/kernel.c'
-KERNEL_BINARY = 'bin/kernel'
-IMAGE = 'bin/image.bin'
-KERNEL_ENTRY = 'kernel_entry'
+
 
 
 # call with make src='your-asm-file.asm'
 # Example make src=bootloader.asm
-all: buildNotFloppy
+all: os-image
 
-# buidls the binary, with floppy image.
-floppy:
-	nasm $(BOOT_LOADER) -f bin -o bin/bootloader.bin
-	dd if=/dev/zero of=floppy.img bs=1024 count=1440
-	dd if=$(BOOT_LOADER_BINARY) of=floppy.img seek=0 count=2 conv=notrunc
-	mkdir bin/iso || true
-	mv floppy.img bin/iso
-	genisoimage -quiet -V $(OSNAME) -input-charset iso8859-1 -o bin/$(OSNAME).iso -b floppy.img -hide floppy.img bin/iso/
-	rm -r bin/iso || true
+# Compiles the bootloader
+bin/bootloader.bin: src/boot/bootloader.asm
+	nasm $< -f bin -o $@
+
+# Compiles the kernel_entry.
+bin/kernel_entry.o: src/boot/kernel_entry.asm
+	nasm $< -f elf64 -o $@
+
+# Compiles the kernel.
+bin/kernel.o: src/kernel/kernel.c
+	gcc -ffreestanding -c $< -o $@
 
 
-# Only builds the binary, without floppy image.
-buildNotFloppy:
-	nasm src/kernel/$(KERNEL_ENTRY).asm -f elf64 -o bin/$(KERNEL_ENTRY).o
-	
-	nasm $(BOOT_LOADER) -f bin -o bin/bootloader.bin
-	gcc -ffreestanding -c $(KERNEL) -o bin/kernel.o
+bin/kernel.bin: bin/kernel_entry.o 	bin/kernel.o 
+	ld -o $@ -Ttext 0x1000 $^ --oformat binary
 
-	ld -o $(KERNEL_BINARY).bin -Ttext 0x1000 bin/$(KERNEL_ENTRY).o $(KERNEL_BINARY).o --oformat binary
-
- 
-
-	# ld -o $(KERNEL_BINARY).bin -Ttext 0x1000 $(KERNEL_BINARY).o --oformat binary
-	cat $(BOOT_LOADER_BINARY) $(KERNEL_BINARY).bin > $(IMAGE)
-	
 
 # lunch the last binary via qemu
 qemu:
-	qemu-system-x86_64 $(IMAGE)
+	qemu-system-x86_64 bin/$(OSNAME)
+
+# This is the actual disk image that the computer loads ,
+# which is the combination of our compiled bootsector and kernel
+os-image: bin/bootloader.bin bin/kernel.bin
+	cat $^ > bin/$(OSNAME)
 
 # cleans the entire bin folder.
 clean:
