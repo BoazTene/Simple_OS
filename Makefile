@@ -38,8 +38,11 @@ clean:
 	rm -r bin || true
 	mkdir bin
 
+# Disassemble our kernel - might be useful for debugging.
+bin/kernel.dis : bin/kernel.bin
+	ndisasm -b 32 $< > $@
 
 # give the src paramter.
 # this will transfer the file to the remove server, using the private key
 transfer:
-	scp -i ./external/id_rsa bin/$(OSNAME).iso 192.168.1.74:/home/boaz/bootloaders/$(OSNAME)
+	scp -i ./external/id_rsa bin/$(OSNAME) 192.168.1.74:/home/boaz/bootloaders/$(OSNAME)
