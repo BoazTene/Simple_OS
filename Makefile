@@ -1,11 +1,15 @@
 
 OSNAME = "SuperDuperOS"
+C_SOURCES = $(wildcard src/kernel/*.c src/drivers/*.c)
+HEADERS = $(wildcard kernel /*.h drivers /*.h)
 
+OBJ = ${C_SOURCES:.c=.o}
 
 
 # call with make src='your-asm-file.asm'
 # Example make src=bootloader.asm
 all: os-image
+	
 
 # Compiles the bootloader
 bin/bootloader.bin: src/boot/bootloader.asm
@@ -20,9 +24,12 @@ bin/kernel.o: src/kernel/kernel.c
 	gcc -ffreestanding -c $< -o $@
 
 
-bin/kernel.bin: bin/kernel_entry.o 	bin/kernel.o 
+bin/kernel.bin: bin/kernel_entry.o 	${OBJ}
 	ld -o $@ -Ttext 0x1000 $^ --oformat binary
 
+# Generic rule for building ’somefile.o’ from ’somefile.c’
+%.o: %.c ${HEADERS}
+	gcc -ffreestanding -c $< -o $@
 
 # lunch the last binary via qemu
 qemu:
