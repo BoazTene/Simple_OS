@@ -1,6 +1,6 @@
 [bits 32]
-[extern main] ; externs the main function, the actuall main will be resolve at link time.
+[extern _start] ; externs the main function, the actuall main will be resolve at link time.
 
-call main ; executing the kernel
+call _start ; executing the kernel
 
 jmp $

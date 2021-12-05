@@ -25,11 +25,12 @@ floppy:
 
 # Only builds the binary, without floppy image.
 buildNotFloppy:
-	nasm src/kernel/$(KERNEL_ENTRY).asm -f elf -o bin/$(KERNEL_ENTRY).o
+	nasm src/kernel/$(KERNEL_ENTRY).asm -f elf64 -o bin/$(KERNEL_ENTRY).o
+	
 	nasm $(BOOT_LOADER) -f bin -o bin/bootloader.bin
 	gcc -ffreestanding -c $(KERNEL) -o bin/kernel.o
 
-	ld -o bin/$(KERNEL_ENTRY).bin -Ttext 0x1000 bin/$(KERNEL_ENTRY).o $(KERNEL_BINARY).o --oformat binary | true
+	ld -o $(KERNEL_BINARY).bin -Ttext 0x1000 bin/$(KERNEL_ENTRY).o $(KERNEL_BINARY).o --oformat binary
 
  
 
