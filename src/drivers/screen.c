@@ -38,7 +38,7 @@ void print_string(char *string, int column, int row, char attribute_type) {
     int init_offset = get_screen_offset(column, row); // the offset of the first char.
     int i = 0;
 
-    char *test = "boaz";
+    char *test = "noaz";
     
     // print_char_offset(string[1], attribute_type, (init_offset));
     print_bytes(test[0], 0);

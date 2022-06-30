@@ -22,8 +22,17 @@ disk:
         ret
 
     .disk_read_error:
+        push ax
+
         mov bx, .DISK_READ_ERROR_MSG
         call print
+
+        pop ax
+        mov al, ah
+        mov ah, 0
+        mov dx, ax
+
+        call print.print_hex
 
         jmp $
 

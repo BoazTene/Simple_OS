@@ -2,7 +2,6 @@
 OSNAME = "SuperDuperOS"
 C_SOURCES = $(wildcard src/kernel/*.c src/drivers/*.c)
 HEADERS = $(wildcard kernel /*.h drivers /*.h)
-
 OBJ = ${C_SOURCES:.c=.o}
 
 
@@ -17,19 +16,21 @@ bin/bootloader.bin: src/boot/bootloader.asm
 
 # Compiles the kernel_entry.
 bin/kernel_entry.o: src/boot/kernel_entry.asm
-	nasm $< -f elf64 -o $@
+	nasm $< -f elf -o $@
 
 # Compiles the kernel.
 bin/kernel.o: src/kernel/kernel.c
-	gcc -ffreestanding -c $< -o $@
+	i686-elf-gcc -c $< -o $@ -ffreestanding -O2 -Wall -Wextra
 
 
 bin/kernel.bin: bin/kernel_entry.o 	${OBJ}
-	ld -o $@ -Ttext 0x1000 $^ --oformat binary
+	i686-elf-gcc -Ttext 0x1000 -o $@ -ffreestanding -O2 -nostdlib $^ -lgcc 
+# i686-elf-ld -o $@ -Ttext 0x1000 $^ --oformat binary
+# ld -o $@ -Ttext 0x1000 $^ --oformat binary
 
 # Generic rule for building ’somefile.o’ from ’somefile.c’
 %.o: %.c ${HEADERS}
-	gcc -ffreestanding -c $< -o $@
+	i686-elf-gcc -c $< -o $@ -ffreestanding -O2 -Wall -Wextra
 
 # lunch the last binary via qemu
 qemu:

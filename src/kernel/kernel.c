@@ -40,7 +40,8 @@ void _start() {
     // bytes[2] = (n >> 8) & 0xFF;
     // bytes[3] = n & 0xFF;
 
-    char *string = "boaz";
+    char *string = "dfdfdfdf";
+    
     // string  
 
     // print_char((string[1] =="o"[0]) + "0"[0], 2, 0, WHITE_ON_BLACK);
